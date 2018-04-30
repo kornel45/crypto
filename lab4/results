@@ -1,0 +1,28 @@
+n = 24
+a = 2
+p = 801
+Generating took 61.50200009346008 seconds
+[a, x, p, b] = [2, 5347597, 801, 182]
+2 ^ 5347597 mod 801 = 182
+Cracking one took 0.0
+10.0 % took: 90 seconds
+20.0 % took: 178 seconds
+30.0 % took: 256 seconds
+40.0 % took: 330 seconds
+50.0 % took: 403 seconds
+60.0 % took: 477 seconds
+70.0 % took: 554 seconds
+80.0 % took: 631 seconds
+90.0 % took: 704 seconds
+100.0 % took: 788 seconds
+Cracking all took 788.8440001010895
+
+n = 24
+a = 2
+p = 401
+[a, x, p, b] = [17, 3502906, 401, 89]
+17 ^ 3502906 mod 401 = 89
+Cracking one took 0.0
+0.0 % took: 0 seconds
+100 % took: 4909 seconds
+Cracking all took 4909 seconds

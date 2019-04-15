@@ -1,7 +1,7 @@
-from Crypto.Cipher import AES
 import hashlib
 import os
 import struct
+from Crypto.Cipher import AES
 
 
 class OpenSSL:
@@ -46,7 +46,7 @@ class OpenSSL:
                     if len(chunk) == 0:
                         break
                     elif len(chunk) % 16 != 0:
-                        chunk += ' ' * (16 - len(chunk) % 16)
+                        chunk += b' ' * (16 - len(chunk) % 16)
 
                     outfile.write(encryptor.encrypt(chunk))
 

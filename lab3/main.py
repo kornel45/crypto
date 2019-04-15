@@ -1,4 +1,4 @@
-# keytool -genkey -alias mydomain -keyalg RSA -keystore KeyStore.jks -keysize 2048
+# keytool -genkey -alias mydomain -keyalg RSA -keypass pass -storepass pass -keystore KeyStore.jks -keysize 2048
 import base64
 import sys
 import textwrap
@@ -26,17 +26,16 @@ def encrypt_msgs(encryptor, msg_list, key, iv):
 
 
 def xor_strings(str1, str2):
-    xored = "".join([chr(ord(a) ^ ord(b)) for a, b in zip(str1, str2)])
-    return xored
+    return "".join([chr(ord(a) ^ ord(b)) for a, b in zip(str1, str2)])
 
 
 def increment_iv(iv):
-    iv = bin(int(iv, 2) + 1)[2:]
-    return '0' * (16 - len(iv)) + iv
+    return format(int(iv, 2) + 1, '016b')
 
 
 def which_msg(enc_type, key, iv, msg_list, enc_msg):
     iv2 = increment_iv(iv)
+    print(iv2)
     encryptor = OpenSSL(enc_type)
     for i, m in enumerate(msg_list):
         xored = xor_strings(xor_strings(iv, iv2), m)
@@ -51,10 +50,10 @@ if __name__ == '__main__':
 
     enc_type = 'cbc'
     openssl = OpenSSL(enc_type)
-    iv = '0' * 16
+    iv = '01' * 8
     iv2 = increment_iv(iv)
     ks = jks.KeyStore.load(parsed_args['keystore_path'], parsed_args['password'])
-    key = ks.private_keys['mydomain'].pkey[:32]
+    key = ks.private_keys['self signed cert'].pkey[:32]
 
     msg_list = ['lubie placki bar', 'pala lufa jedyna']
     msg_list = [x[:16] for x in msg_list]
@@ -62,8 +61,10 @@ if __name__ == '__main__':
     random_msg = msg_list[rand]
 
     enc_m1 = openssl.encrypt_msg(random_msg, key, iv)
-    print('Encrypting "{}" to "{}"'.format(random_msg, enc_m1))
+    print('Encrypting "{}" to {}'.format(random_msg, enc_m1))
 
     ind, cipher = which_msg(enc_type, key, iv, msg_list, enc_m1)
     print('"{}" was encrypted to: {}'.format(msg_list[ind], cipher))
 
+    openssl.encrypt_file(key, bytes(iv, 'utf-8'), 'command_line_parser.py', 'command_line_parser.enc')
+    openssl.decrypt_file(key, bytes(iv, 'utf-8'), 'command_line_parser.enc', 'command_line_parser.dec')

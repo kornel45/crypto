@@ -3,7 +3,7 @@ import base64
 import sys
 import textwrap
 from random import randint
-
+import os
 import jks
 
 from command_line_parser import CommandLineParser
@@ -44,6 +44,21 @@ def which_msg(enc_type, key, iv, msg_list, enc_msg):
             return i, enc_m
 
 
+def test_mode(file_to_encrypt, mode):
+    open_ssl = OpenSSL(mode)
+    encrypted_path = file_to_encrypt.replace('.py', '.enc')
+    open_ssl.encrypt_file(key, bytes(iv, 'utf-8'), file_to_encrypt, encrypted_path)
+    decrypted_path = file_to_encrypt.replace('.py', '.dec')
+    open_ssl.decrypt_file(key, bytes(iv, 'utf-8'), encrypted_path, decrypted_path)
+    with open(file_to_encrypt, 'r') as original:
+        with open(decrypted_path, 'r') as decrypted:
+            assert original.read() == decrypted.read()
+
+    os.remove(decrypted_path)
+    os.remove(encrypted_path)
+    print('Test for {} passed'.format(mode))
+
+
 if __name__ == '__main__':
     command_line_parser = CommandLineParser()
     parsed_args = command_line_parser.parse_arguments(sys.argv[1:])
@@ -66,5 +81,6 @@ if __name__ == '__main__':
     ind, cipher = which_msg(enc_type, key, iv, msg_list, enc_m1)
     print('"{}" was encrypted to: {}'.format(msg_list[ind], cipher))
 
-    openssl.encrypt_file(key, bytes(iv, 'utf-8'), 'command_line_parser.py', 'command_line_parser.enc')
-    openssl.decrypt_file(key, bytes(iv, 'utf-8'), 'command_line_parser.enc', 'command_line_parser.dec')
+    test_mode('command_line_parser.py', 'cbc')
+    test_mode('command_line_parser.py', 'ofb')
+    test_mode('command_line_parser.py', 'ctr')

@@ -2,6 +2,7 @@ import hashlib
 import os
 import struct
 from Crypto.Cipher import AES
+from Crypto.Util import Counter
 
 
 class OpenSSL:
@@ -32,9 +33,11 @@ class OpenSSL:
             key = hashlib.sha256(key).digest()
         if not out_filename:
             out_filename = in_filename + '.enc'
-
-        # iv = ''.join(chr(random.randint(0, 0xFF)) for i in range(16))
-        encryptor = AES.new(key, AES.MODE_CBC, iv)
+        if self.mode == AES.MODE_CTR:
+            counter = Counter.new(128, initial_value=0)
+            encryptor = AES.new(key, self.mode, counter=counter)
+        else:
+            encryptor = AES.new(key, self.mode, iv)
         filesize = os.path.getsize(in_filename)
 
         with open(in_filename, 'rb') as infile:
@@ -64,7 +67,11 @@ class OpenSSL:
         with open(in_filename, 'rb') as infile:
             origsize = struct.unpack('<Q', infile.read(struct.calcsize('Q')))[0]
             iv = infile.read(16)
-            decryptor = AES.new(key, AES.MODE_CBC, iv)
+            if self.mode == AES.MODE_CTR:
+                counter = Counter.new(128, initial_value=0)
+                decryptor = AES.new(key, self.mode, counter=counter)
+            else:
+                decryptor = AES.new(key, self.mode, iv)
 
             with open(out_filename, 'wb') as outfile:
                 while True:

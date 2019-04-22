@@ -35,7 +35,6 @@ def increment_iv(iv):
 
 def which_msg(enc_type, key, iv, msg_list, enc_msg):
     iv2 = increment_iv(iv)
-    print(iv2)
     encryptor = OpenSSL(enc_type)
     for i, m in enumerate(msg_list):
         xored = xor_strings(xor_strings(iv, iv2), m)
@@ -50,8 +49,8 @@ def test_mode(file_to_encrypt, mode):
     open_ssl.encrypt_file(key, bytes(iv, 'utf-8'), file_to_encrypt, encrypted_path)
     decrypted_path = file_to_encrypt.replace('.py', '.dec')
     open_ssl.decrypt_file(key, bytes(iv, 'utf-8'), encrypted_path, decrypted_path)
-    with open(file_to_encrypt, 'r') as original:
-        with open(decrypted_path, 'r') as decrypted:
+    with open(file_to_encrypt, 'rb') as original:
+        with open(decrypted_path, 'rb') as decrypted:
             assert original.read() == decrypted.read()
 
     os.remove(decrypted_path)
@@ -65,7 +64,7 @@ if __name__ == '__main__':
 
     enc_type = 'cbc'
     openssl = OpenSSL(enc_type)
-    iv = '01' * 8
+    iv = '0' * 16
     iv2 = increment_iv(iv)
     ks = jks.KeyStore.load(parsed_args['keystore_path'], parsed_args['password'])
     key = ks.private_keys['self signed cert'].pkey[:32]

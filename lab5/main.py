@@ -13,7 +13,7 @@ if __name__ == '__main__':
     d = 5
     p = 17
     ec = EdwardsCurves(d, p)
-    g = ec.create_point(10, 5)  # must be on edwards curve
+    g = ec.create_point(7, 12)  # must be on edwards curve
     message = ec.create_point(12, 7)  # must be on edwards curve
     eg = ElGamal(ec, g)
     priv_key = random.randint(1, eg.n - 1)  # smaller than order of point because we don't want pub_key to be base_point

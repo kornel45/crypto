@@ -1,3 +1,7 @@
+import numba
+
+
+@numba.jit(nopython=True)
 def get_possible_points(d, p):
     s = set()
     for x in range(p):
@@ -8,7 +12,7 @@ def get_possible_points(d, p):
 
 
 if __name__ == '__main__':
-    p = 17
+    p = 4021
     d = 5
     result = get_possible_points(d, p)
     print(result)
